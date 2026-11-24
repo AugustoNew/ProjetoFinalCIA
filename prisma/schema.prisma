@@ -26,6 +26,7 @@ model User {
   passwordHash   String
   role           UserRole
   createdAt      DateTime       @default(now())
+  timeZone       String         @default("America/Sao_Paulo")
   services       Service[]
   availabilities Availability[]
   timeOffs       TimeOff[]

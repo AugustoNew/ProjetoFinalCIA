@@ -38,6 +38,18 @@ Todo commit deve seguir Conventional Commits. Exemplos:
 - `fix: corrigir conflito de horário`
 - `docs: atualizar instruções`
 
+## Datas e fusos horários
+
+- Cada prestador possui um fuso IANA configurável em `User.timeZone`, com
+  `America/Sao_Paulo` como padrão.
+- Disponibilidades semanais são horários locais (`HH:mm`) interpretados no
+  fuso do prestador, pois representam horários recorrentes no relógio local.
+- Folgas, bloqueios, agendamentos e demais instantes são armazenados em UTC.
+  Entradas locais devem ser convertidas usando o fuso do prestador antes de
+  gravar; datas exibidas devem ser formatadas nesse mesmo fuso.
+- Rejeite horários locais inexistentes ou ambíguos durante transições de horário
+  de verão, em vez de escolher um instante silenciosamente.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
