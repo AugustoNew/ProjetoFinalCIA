@@ -1,5 +1,5 @@
 import { PrismaClient, UserRole, AppointmentStatus } from "@prisma/client";
-import { scryptSync } from "node:crypto";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 const services = [
@@ -46,7 +46,7 @@ function nextWeekday(weekdaysAhead) {
 }
 
 async function main() {
-  const passwordHash = `scrypt$${scryptSync("agendaki-demo", "agendaki-seed-salt", 64).toString("hex")}`;
+  const passwordHash = bcrypt.hashSync("agendaki-demo", 12);
 
   const provider = await prisma.user.upsert({
     where: { email: "prestador@agendaki.dev" },

@@ -23,6 +23,10 @@ npm run db:seed
 npx prisma generate
 ```
 
+Defina `AUTH_SECRET` no `.env` com um valor aleatório (por exemplo,
+`npx auth secret`). O `.env.example` também inclui `AUTH_URL` para o ambiente
+local.
+
 No PowerShell, use `Copy-Item .env.example .env` caso `copy` não esteja disponível.
 
 ## Desenvolvimento
@@ -65,3 +69,10 @@ Para recriar o banco local, execute `npm run db:migrate -- --name init`. O seed
 é idempotente e cria o prestador `prestador@agendaki.dev`, três serviços,
 disponibilidade de segunda a sexta-feira, das 9h às 18h, e dois agendamentos
 futuros de exemplo. A senha demonstrativa usada no seed é `agendaki-demo`.
+
+## Autenticação
+
+Prestadores podem criar conta em `/cadastro` e entrar em `/login`. Senhas são
+armazenadas com bcrypt; as rotas em `/painel` exigem uma sessão autenticada.
+No Next.js 16, `src/proxy.ts` (renomeação do middleware) redireciona usuários
+não autenticados ao login e impede que usuários autenticados acessem `/login`.
