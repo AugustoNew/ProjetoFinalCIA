@@ -18,6 +18,8 @@ Pré-requisitos: Node.js 20 ou superior e npm.
 ```bash
 npm install
 copy .env.example .env
+npm run db:migrate -- --name init
+npm run db:seed
 npx prisma generate
 ```
 
@@ -41,3 +43,25 @@ npm run format
 npm run test
 npx prisma studio
 ```
+
+## Modelo de dados
+
+```mermaid
+erDiagram
+  User ||--o{ Service : oferece
+  User ||--o{ Availability : define
+  User ||--o{ TimeOff : bloqueia
+  User ||--o{ Appointment : recebe
+  Service ||--o{ Appointment : agenda
+```
+
+`User` tem papel de prestador ou cliente. Serviços, disponibilidades e folgas
+pertencem ao prestador; cada agendamento referencia um serviço e um prestador,
+além de guardar os dados de contato do cliente. Os agendamentos têm status e
+token de cancelamento único. Preços são armazenados como `Decimal`.
+`Availability.dayOfWeek` usa `0` para domingo e `6` para sábado.
+
+Para recriar o banco local, execute `npm run db:migrate -- --name init`. O seed
+é idempotente e cria o prestador `prestador@agendaki.dev`, três serviços,
+disponibilidade de segunda a sexta-feira, das 9h às 18h, e dois agendamentos
+futuros de exemplo. A senha demonstrativa usada no seed é `agendaki-demo`.

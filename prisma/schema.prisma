@@ -6,3 +6,86 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  PROVIDER
+  CLIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id             String         @id @default(cuid())
+  name           String
+  email          String         @unique
+  passwordHash   String
+  role           UserRole
+  createdAt      DateTime       @default(now())
+  services       Service[]
+  availabilities Availability[]
+  timeOffs       TimeOff[]
+  appointments   Appointment[]
+}
+
+model Service {
+  id              String        @id @default(cuid())
+  providerId      String
+  name            String
+  description     String
+  durationMinutes Int
+  price           Decimal
+  active          Boolean       @default(true)
+  provider        User          @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  appointments    Appointment[]
+
+  @@index([providerId])
+}
+
+model Availability {
+  id         String @id @default(cuid())
+  providerId String
+  dayOfWeek  Int
+  startTime  String
+  endTime    String
+  provider   User   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, dayOfWeek, startTime, endTime])
+  @@index([providerId, dayOfWeek])
+}
+
+model TimeOff {
+  id         String   @id @default(cuid())
+  providerId String
+  startsAt   DateTime
+  endsAt     DateTime
+  reason     String
+  provider   User     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId, startsAt, endsAt])
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  serviceId   String
+  providerId  String
+  clientName  String
+  clientEmail String
+  clientPhone String
+  startsAt    DateTime
+  endsAt      DateTime
+  status      AppointmentStatus @default(PENDING)
+  cancelToken String            @unique
+  createdAt   DateTime          @default(now())
+  service     Service           @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  provider    User              @relation(fields: [providerId], references: [id], onDelete: Restrict)
+
+  @@index([providerId, startsAt])
+  @@index([serviceId, startsAt])
+  @@index([clientEmail])
+  @@index([status, startsAt])
+}
