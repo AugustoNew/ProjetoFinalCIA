@@ -38,7 +38,7 @@ model Service {
   name            String
   description     String
   durationMinutes Int
-  price           Decimal
+  priceCents      Int
   active          Boolean       @default(true)
   provider        User          @relation(fields: [providerId], references: [id], onDelete: Cascade)
   appointments    Appointment[]

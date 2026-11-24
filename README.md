@@ -62,7 +62,8 @@ erDiagram
 `User` tem papel de prestador ou cliente. Serviços, disponibilidades e folgas
 pertencem ao prestador; cada agendamento referencia um serviço e um prestador,
 além de guardar os dados de contato do cliente. Os agendamentos têm status e
-token de cancelamento único. Preços são armazenados como `Decimal`.
+token de cancelamento único. Preços de serviços são armazenados em centavos
+(`priceCents`).
 `Availability.dayOfWeek` usa `0` para domingo e `6` para sábado.
 
 Para recriar o banco local, execute `npm run db:migrate -- --name init`. O seed
@@ -76,3 +77,10 @@ Prestadores podem criar conta em `/cadastro` e entrar em `/login`. Senhas são
 armazenadas com bcrypt; as rotas em `/painel` exigem uma sessão autenticada.
 No Next.js 16, `src/proxy.ts` (renomeação do middleware) redireciona usuários
 não autenticados ao login e impede que usuários autenticados acessem `/login`.
+
+## Gestão de serviços
+
+Em `/painel/servicos`, cada prestador pode listar, criar, editar, ativar,
+desativar e excluir seus próprios serviços. Serviços com agendamentos futuros
+não podem ser excluídos; desativá-los preserva os agendamentos. O preço fica
+armazenado em centavos (`priceCents`) e é exibido em reais na interface.

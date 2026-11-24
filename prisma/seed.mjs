@@ -8,21 +8,21 @@ const services = [
     name: "Consultoria",
     description: "Atendimento individual de consultoria.",
     durationMinutes: 60,
-    price: "120.00",
+    priceCents: 12000,
   },
   {
     id: "agendaki-seed-follow-up",
     name: "Retorno",
     description: "Sessão de acompanhamento.",
     durationMinutes: 45,
-    price: "80.00",
+    priceCents: 8000,
   },
   {
     id: "agendaki-seed-assessment",
     name: "Avaliação inicial",
     description: "Conversa inicial para entender suas necessidades.",
     durationMinutes: 30,
-    price: "60.00",
+    priceCents: 6000,
   },
 ];
 
