@@ -83,7 +83,7 @@ export async function createPublicBooking(input: PublicBookingInput) {
         clientEmail: true,
         clientPhone: true,
         provider: {
-          select: { slug: true, name: true, timeZone: true },
+          select: { slug: true, name: true, email: true, timeZone: true },
         },
         service: {
           select: {

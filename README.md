@@ -84,3 +84,19 @@ Em `/painel/servicos`, cada prestador pode listar, criar, editar, ativar,
 desativar e excluir seus próprios serviços. Serviços com agendamentos futuros
 não podem ser excluídos; desativá-los preserva os agendamentos. O preço fica
 armazenado em centavos (`priceCents`) e é exibido em reais na interface.
+
+## Emails transacionais
+
+Em desenvolvimento, os emails são exibidos no console. Em produção, o envio
+usa a API do Resend. Configure `APP_URL`, `RESEND_API_KEY` e `EMAIL_FROM` no
+ambiente de produção; o endereço remetente precisa estar verificado no Resend.
+O envio da confirmação e do aviso ao prestador não impede a criação da reserva
+se o provedor de email falhar.
+
+Confirmações incluem um link seguro para o cliente cancelar o agendamento. O
+prestador também recebe emails quando um novo agendamento é feito ou cancelado.
+O cliente recebe um lembrete próximo de 24 horas antes do horário.
+
+Configure um cron para chamar `GET /api/cron/appointment-reminders` a cada 15
+minutos, enviando `Authorization: Bearer <CRON_SECRET>`. O endpoint processa
+lembretes ainda não enviados e registra o envio para evitar duplicidades.

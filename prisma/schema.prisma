@@ -72,22 +72,25 @@ model TimeOff {
 }
 
 model Appointment {
-  id          String            @id @default(cuid())
-  serviceId   String
-  providerId  String
-  clientName  String
-  clientEmail String
-  clientPhone String
-  startsAt    DateTime
-  endsAt      DateTime
-  status      AppointmentStatus @default(PENDING)
-  cancelToken String            @unique
-  createdAt   DateTime          @default(now())
-  service     Service           @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  provider    User              @relation(fields: [providerId], references: [id], onDelete: Restrict)
+  id                String            @id @default(cuid())
+  serviceId         String
+  providerId        String
+  clientName        String
+  clientEmail       String
+  clientPhone       String
+  startsAt          DateTime
+  endsAt            DateTime
+  status            AppointmentStatus @default(PENDING)
+  cancelToken       String            @unique
+  createdAt         DateTime          @default(now())
+  reminderSentAt    DateTime?
+  reminderClaimedAt DateTime?
+  service           Service           @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  provider          User              @relation(fields: [providerId], references: [id], onDelete: Restrict)
 
   @@index([providerId, startsAt])
   @@index([serviceId, startsAt])
   @@index([clientEmail])
   @@index([status, startsAt])
+  @@index([status, startsAt, reminderSentAt])
 }

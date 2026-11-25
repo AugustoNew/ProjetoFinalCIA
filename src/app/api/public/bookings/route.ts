@@ -6,6 +6,7 @@ import {
   isBookingRace,
   PublicBookingError,
 } from "@/server/public-booking";
+import { sendNewBookingEmails } from "@/server/email/notifications";
 import { checkRateLimit } from "@/server/rate-limit";
 
 const bookingLimit = 5;
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
 
   try {
     const appointment = await createPublicBooking(parsedBooking.data);
+    await sendNewBookingEmails(appointment);
     return NextResponse.json(
       { cancelToken: appointment.cancelToken },
       { status: 201 },

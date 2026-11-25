@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { cancelAppointmentAndNotify } from "@/server/appointment-cancellation";
 
 const appointmentActionSchema = z.object({
   appointmentId: z.string().trim().min(1).max(100),
@@ -43,25 +44,27 @@ export async function updateAppointmentStatus(
     return { success: false, message: "Ação de agendamento inválida." };
   }
 
-  const currentStatus =
-    parsedInput.data.status === "CONFIRMED"
-      ? AppointmentStatus.PENDING
-      : parsedInput.data.status === "CANCELLED"
-        ? {
-            in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED],
-          }
-        : AppointmentStatus.CONFIRMED;
+  const updated =
+    parsedInput.data.status === "CANCELLED"
+      ? await cancelAppointmentAndNotify({
+          id: parsedInput.data.appointmentId,
+          providerId: provider.id,
+        })
+      : (
+          await prisma.appointment.updateMany({
+            where: {
+              id: parsedInput.data.appointmentId,
+              providerId: provider.id,
+              status:
+                parsedInput.data.status === "CONFIRMED"
+                  ? AppointmentStatus.PENDING
+                  : AppointmentStatus.CONFIRMED,
+            },
+            data: { status: parsedInput.data.status },
+          })
+        ).count > 0;
 
-  const result = await prisma.appointment.updateMany({
-    where: {
-      id: parsedInput.data.appointmentId,
-      providerId: provider.id,
-      status: currentStatus,
-    },
-    data: { status: parsedInput.data.status },
-  });
-
-  if (result.count === 0) {
+  if (!updated) {
     return {
       success: false,
       message:
