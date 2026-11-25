@@ -1,4 +1,4 @@
-import { AppointmentStatus, UserRole } from "@prisma/client";
+import { AppointmentStatus, UserRole, type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { formatDateTimeLocal } from "@/lib/time-zone";
 import { generateAvailableSlots } from "./slots";
@@ -14,6 +14,11 @@ export type GetAvailableSlotsOptions = {
 export type IsSlotAvailableOptions = Omit<GetAvailableSlotsOptions, "date"> & {
   startsAt: Date;
 };
+
+type SchedulingClient = Pick<
+  Prisma.TransactionClient,
+  "user" | "service" | "availability" | "appointment" | "timeOff"
+>;
 
 function getDateStart(date: string) {
   const match = /^(\d{4})-\d{2}-\d{2}$/.exec(date);
@@ -42,14 +47,17 @@ function getUtcSearchRange(date: string) {
   };
 }
 
-async function loadAvailableSlots({
-  providerId,
-  serviceId,
-  date,
-  minimumNoticeHours,
-  slotIntervalMinutes,
-}: GetAvailableSlotsOptions) {
-  const provider = await prisma.user.findFirst({
+async function loadAvailableSlots(
+  {
+    providerId,
+    serviceId,
+    date,
+    minimumNoticeHours,
+    slotIntervalMinutes,
+  }: GetAvailableSlotsOptions,
+  client: SchedulingClient = prisma,
+) {
+  const provider = await client.user.findFirst({
     where: { id: providerId, role: UserRole.PROVIDER },
     select: { id: true, timeZone: true },
   });
@@ -57,7 +65,7 @@ async function loadAvailableSlots({
     return [];
   }
 
-  const service = await prisma.service.findFirst({
+  const service = await client.service.findFirst({
     where: { id: serviceId, providerId: provider.id, active: true },
     select: { durationMinutes: true },
   });
@@ -66,7 +74,7 @@ async function loadAvailableSlots({
   }
 
   const dayOfWeek = getDateStart(date).getUTCDay();
-  const availability = await prisma.availability.findMany({
+  const availability = await client.availability.findMany({
     where: { providerId: provider.id, dayOfWeek },
     select: { dayOfWeek: true, startTime: true, endTime: true },
   });
@@ -76,7 +84,7 @@ async function loadAvailableSlots({
 
   const range = getUtcSearchRange(date);
   const [appointments, timeOffs] = await Promise.all([
-    prisma.appointment.findMany({
+    client.appointment.findMany({
       where: {
         providerId: provider.id,
         status: { not: AppointmentStatus.CANCELLED },
@@ -85,7 +93,7 @@ async function loadAvailableSlots({
       },
       select: { startsAt: true, endsAt: true, status: true },
     }),
-    prisma.timeOff.findMany({
+    client.timeOff.findMany({
       where: {
         providerId: provider.id,
         startsAt: { lte: range.endsAt },
@@ -113,18 +121,21 @@ export async function getAvailableSlots(
   return loadAvailableSlots(options);
 }
 
-export async function isSlotAvailable({
-  providerId,
-  serviceId,
-  startsAt,
-  minimumNoticeHours,
-  slotIntervalMinutes,
-}: IsSlotAvailableOptions): Promise<boolean> {
+export async function isSlotAvailable(
+  {
+    providerId,
+    serviceId,
+    startsAt,
+    minimumNoticeHours,
+    slotIntervalMinutes,
+  }: IsSlotAvailableOptions,
+  client: SchedulingClient = prisma,
+): Promise<boolean> {
   if (!(startsAt instanceof Date) || Number.isNaN(startsAt.getTime())) {
     return false;
   }
 
-  const provider = await prisma.user.findFirst({
+  const provider = await client.user.findFirst({
     where: { id: providerId, role: UserRole.PROVIDER },
     select: { timeZone: true },
   });
@@ -136,13 +147,16 @@ export async function isSlotAvailable({
     0,
     10,
   );
-  const availableSlots = await loadAvailableSlots({
-    providerId,
-    serviceId,
-    date: localDate,
-    minimumNoticeHours,
-    slotIntervalMinutes,
-  });
+  const availableSlots = await loadAvailableSlots(
+    {
+      providerId,
+      serviceId,
+      date: localDate,
+      minimumNoticeHours,
+      slotIntervalMinutes,
+    },
+    client,
+  );
 
   return availableSlots.some((slot) => slot.getTime() === startsAt.getTime());
 }

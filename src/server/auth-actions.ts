@@ -2,7 +2,9 @@
 
 import { Prisma, UserRole } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { randomBytes } from "node:crypto";
 import { registerSchema } from "@/lib/auth-validation";
+import { slugifyProviderName } from "@/lib/slug-validation";
 import { prisma } from "@/lib/prisma";
 
 export async function registerProvider(input: unknown) {
@@ -28,6 +30,7 @@ export async function registerProvider(input: unknown) {
       data: {
         name,
         email,
+        slug: `${slugifyProviderName(name)}-${randomBytes(4).toString("hex")}`,
         passwordHash,
         role: UserRole.PROVIDER,
       },

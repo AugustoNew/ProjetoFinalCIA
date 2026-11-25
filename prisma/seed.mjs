@@ -52,12 +52,14 @@ async function main() {
     where: { email: "prestador@agendaki.dev" },
     update: {
       name: "Prestador de Exemplo",
+      slug: "prestador-exemplo",
       passwordHash,
       role: UserRole.PROVIDER,
     },
     create: {
       id: "agendaki-seed-provider",
       name: "Prestador de Exemplo",
+      slug: "prestador-exemplo",
       email: "prestador@agendaki.dev",
       passwordHash,
       role: UserRole.PROVIDER,
