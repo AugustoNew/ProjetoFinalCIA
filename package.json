@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "e2e:prepare": "node scripts/prepare-e2e.mjs",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed"
   },
   "dependencies": {

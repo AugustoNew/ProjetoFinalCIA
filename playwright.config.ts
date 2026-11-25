@@ -1,6 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = "http://127.0.0.1:3100";
+const e2eDatabaseUrl =
+  process.env.E2E_DATABASE_URL ??
+  "postgresql://agendaki:agendaki_dev@localhost:5432/agendaki_e2e?schema=public";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -27,7 +30,9 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 120_000,
     env: {
-      DATABASE_URL: "file:./e2e.db",
+      DATABASE_URL: e2eDatabaseUrl,
+      DIRECT_URL: e2eDatabaseUrl,
+      E2E_DATABASE_URL: e2eDatabaseUrl,
       AUTH_SECRET: "playwright-test-secret-not-for-production",
       AUTH_URL: baseURL,
       APP_URL: baseURL,

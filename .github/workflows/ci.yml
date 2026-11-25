@@ -10,8 +10,24 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: agendaki
+          POSTGRES_PASSWORD: agendaki_test
+          POSTGRES_DB: agendaki_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agendaki -d agendaki_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
-      DATABASE_URL: file:./dev.db
+      DATABASE_URL: postgresql://agendaki:agendaki_test@localhost:5432/agendaki_test?schema=public
+      DIRECT_URL: postgresql://agendaki:agendaki_test@localhost:5432/agendaki_test?schema=public
+      E2E_DATABASE_URL: postgresql://agendaki:agendaki_test@localhost:5432/agendaki_test?schema=public
       AUTH_SECRET: github-actions-test-secret-not-for-production
       AUTH_URL: http://localhost:3000
       APP_URL: http://localhost:3000

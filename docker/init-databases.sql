@@ -1,0 +1,1 @@
+CREATE DATABASE agendaki_e2e OWNER agendaki;
