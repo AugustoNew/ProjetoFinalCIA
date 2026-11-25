@@ -22,7 +22,7 @@ export function CancellationForm({
 
   return (
     <form action={cancelPublicAppointment} onSubmit={confirmCancellation}>
-      <input name="cancelToken" type="hidden" value={cancelToken} />
+      <input defaultValue={cancelToken} name="cancelToken" type="hidden" />
       <button
         className="min-h-11 w-full rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
         type="submit"

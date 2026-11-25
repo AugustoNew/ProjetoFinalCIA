@@ -45,7 +45,17 @@ npm run build
 npm run lint
 npm run format
 npm run test
+npm run test:e2e
 npx prisma studio
+```
+
+Os testes E2E usam Playwright e um banco SQLite isolado (`prisma/e2e.db`), que
+é recriado automaticamente ao iniciar a suíte. Na primeira execução, instale
+o navegador:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
 ```
 
 ## Modelo de dados

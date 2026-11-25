@@ -72,6 +72,7 @@ export async function GET(request: Request) {
     providerId: appointment.providerId,
     serviceId: appointment.serviceId,
     date,
+    minimumNoticeHours: appointment.provider.minimumCancellationNoticeHours,
     excludeAppointmentId: appointment.id,
   });
 

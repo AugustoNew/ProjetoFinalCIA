@@ -291,14 +291,14 @@ export function AgendaManager({
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
             method="get"
           >
-            <input name="view" type="hidden" value={view} />
+            <input defaultValue={view} name="view" type="hidden" />
             <label className="grid gap-1 text-sm font-medium text-zinc-700">
               Data
               <input
                 className="min-h-11 rounded-lg border border-zinc-300 px-3 py-2"
                 name="date"
                 type="date"
-                value={date}
+                defaultValue={date}
               />
             </label>
             <label className="grid gap-1 text-sm font-medium text-zinc-700">

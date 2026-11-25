@@ -100,6 +100,7 @@ export async function reschedulePublicAppointment(input: RescheduleInput) {
         providerId: appointment.providerId,
         serviceId: appointment.serviceId,
         startsAt: input.startsAt,
+        minimumNoticeHours: appointment.provider.minimumCancellationNoticeHours,
         excludeAppointmentId: appointment.id,
       },
       transaction,
