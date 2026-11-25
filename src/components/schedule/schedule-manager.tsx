@@ -6,9 +6,11 @@ import {
   createTimeOff,
   deleteTimeOff,
   saveWeeklyAvailability,
+  updateCancellationNoticeHours,
   updateProviderTimeZone,
 } from "@/server/schedule-actions";
 import {
+  cancellationNoticeHoursSchema,
   timeOffSchema,
   timeZoneSchema,
   weeklyAvailabilitySchema,
@@ -72,16 +74,21 @@ function getInitialWeek(availability: AvailabilityItem[]) {
 export function ScheduleManager({
   availability,
   timeOffs,
+  minimumCancellationNoticeHours,
   timeZone,
 }: {
   availability: AvailabilityItem[];
   timeOffs: TimeOffItem[];
+  minimumCancellationNoticeHours: number;
   timeZone: string;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [week, setWeek] = useState(() => getInitialWeek(availability));
   const [selectedTimeZone, setSelectedTimeZone] = useState(timeZone);
+  const [cancellationNoticeHours, setCancellationNoticeHours] = useState(
+    String(minimumCancellationNoticeHours),
+  );
   const [startsAtLocal, setStartsAtLocal] = useState("");
   const [endsAtLocal, setEndsAtLocal] = useState("");
   const [reason, setReason] = useState("");
@@ -200,6 +207,32 @@ export function ScheduleManager({
     }
 
     runAction(() => updateProviderTimeZone(parsed.data));
+  }
+
+  function submitCancellationNotice(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!/^\d+$/.test(cancellationNoticeHours)) {
+      setToast({
+        type: "error",
+        message: "Informe a antecedência em horas inteiras.",
+      });
+      return;
+    }
+
+    const parsed = cancellationNoticeHoursSchema.safeParse(
+      Number(cancellationNoticeHours),
+    );
+    if (!parsed.success) {
+      setToast({
+        type: "error",
+        message:
+          parsed.error.issues[0]?.message ??
+          "Confira a antecedência informada.",
+      });
+      return;
+    }
+
+    runAction(() => updateCancellationNoticeHours(parsed.data));
   }
 
   function submitTimeOff(event: FormEvent<HTMLFormElement>) {
@@ -379,6 +412,47 @@ export function ScheduleManager({
             type="submit"
           >
             Salvar fuso
+          </button>
+        </form>
+      </section>
+
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-semibold text-zinc-900">
+          Política de cancelamento e reagendamento
+        </h2>
+        <p className="mt-1 text-sm text-zinc-600">
+          Clientes precisam solicitar alterações com esta antecedência mínima.
+          Use 0 para permitir alterações até o horário do atendimento.
+        </p>
+        <form
+          className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
+          onSubmit={submitCancellationNotice}
+        >
+          <label className="grid gap-1.5 text-sm font-medium text-zinc-700">
+            Antecedência mínima (horas)
+            <input
+              className="w-full rounded-lg border border-zinc-300 px-3 py-2 sm:w-48"
+              disabled={isPending}
+              max={720}
+              min={0}
+              onChange={(event) =>
+                setCancellationNoticeHours(event.target.value)
+              }
+              required
+              step={1}
+              type="number"
+              value={cancellationNoticeHours}
+            />
+          </label>
+          <button
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-60"
+            disabled={
+              isPending ||
+              Number(cancellationNoticeHours) === minimumCancellationNoticeHours
+            }
+            type="submit"
+          >
+            Salvar antecedência
           </button>
         </form>
       </section>

@@ -33,6 +33,12 @@ export const timeZoneSchema = z
   .max(100, "O fuso horário é muito longo.")
   .refine(isSupportedTimeZone, "Informe um fuso IANA válido.");
 
+export const cancellationNoticeHoursSchema = z
+  .number()
+  .int("A antecedência deve ser informada em horas inteiras.")
+  .min(0, "A antecedência não pode ser negativa.")
+  .max(720, "A antecedência máxima é de 720 horas.");
+
 export const weeklyAvailabilitySchema = z
   .array(
     z

@@ -95,7 +95,11 @@ se o provedor de email falhar.
 
 Confirmações incluem um link seguro para o cliente cancelar o agendamento. O
 prestador também recebe emails quando um novo agendamento é feito ou cancelado.
-O cliente recebe um lembrete próximo de 24 horas antes do horário.
+O cliente recebe um lembrete próximo de 24 horas antes do horário. Em
+`/painel/horarios`, o prestador configura o prazo mínimo (padrão de 12 horas,
+entre 0 e 720 horas) para cancelamento ou reagendamento. O link privado em
+`/agendamento/[cancelToken]` permite consultar os detalhes e gerenciar o
+horário; reagendamentos revalidam os slots no servidor e avisam ambas as partes.
 
 Configure um cron para chamar `GET /api/cron/appointment-reminders` a cada 15
 minutos, enviando `Authorization: Bearer <CRON_SECRET>`. O endpoint processa

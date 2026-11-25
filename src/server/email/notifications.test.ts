@@ -3,6 +3,7 @@ import {
   sendCancellationEmails,
   sendAppointmentReminderEmail,
   sendNewBookingEmails,
+  sendRescheduleEmails,
 } from "@/server/email/notifications";
 import { sendEmailSafely, type EmailMessage } from "@/server/email/provider";
 
@@ -51,7 +52,7 @@ describe("transactional email notifications", () => {
     expect(clientMessage?.subject).toContain("Agendamento solicitado");
     expect(clientMessage?.html).toContain("&lt;Ana &amp; &quot;Bia&quot;&gt;");
     expect(clientMessage?.html).toContain(
-      `https://agendaki.example/agendamento/cancelar?token=${appointment.cancelToken}`,
+      `https://agendaki.example/agendamento/${appointment.cancelToken}`,
     );
     expect(
       messages.some((message) => message.to === appointment.provider.email),
@@ -83,6 +84,31 @@ describe("transactional email notifications", () => {
       ]),
     );
     expect(messages).toHaveLength(2);
+  });
+
+  it("notifies both parties with the old and new times after rescheduling", async () => {
+    await sendRescheduleEmails(
+      appointment,
+      new Date("2026-12-10T12:00:00.000Z"),
+      new Date("2026-12-10T12:30:00.000Z"),
+    );
+
+    const messages = vi
+      .mocked(console.info)
+      .mock.calls.map((call) => call[1] as EmailMessage);
+    expect(messages).toHaveLength(2);
+    expect(messages.map((message) => message.to)).toEqual(
+      expect.arrayContaining([
+        appointment.clientEmail,
+        appointment.provider.email,
+      ]),
+    );
+    const clientMessage = messages.find(
+      (message) => message.to === appointment.clientEmail,
+    );
+    expect(clientMessage?.subject).toContain("reagendado");
+    expect(clientMessage?.html).toContain("Horário anterior:");
+    expect(clientMessage?.html).toContain("Novo horário:");
   });
 
   it("logs email provider failures and returns a failed result", async () => {

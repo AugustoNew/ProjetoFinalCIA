@@ -84,9 +84,7 @@ function appointmentSummary(appointment: AppointmentEmailData) {
 }
 
 function getCancellationUrl(cancelToken: string) {
-  const url = new URL(getApplicationUrl("/agendamento/cancelar"));
-  url.searchParams.set("token", cancelToken);
-  return url.toString();
+  return getApplicationUrl(`/agendamento/${encodeURIComponent(cancelToken)}`);
 }
 
 export async function sendNewBookingEmails(appointment: AppointmentEmailData) {
@@ -151,6 +149,57 @@ export async function sendCancellationEmails(
         html: renderEmail("Um agendamento foi cancelado", [
           `Cliente: ${appointment.clientName} (${appointment.clientEmail}).`,
           details,
+        ]),
+      };
+    }),
+  ]);
+}
+
+export async function sendRescheduleEmails(
+  appointment: AppointmentEmailData,
+  previousStartsAt: Date,
+  previousEndsAt: Date,
+) {
+  await Promise.all([
+    sendEmailSafely(() => {
+      const previousStart = formatDateTime(
+        previousStartsAt,
+        appointment.provider.timeZone,
+      );
+      const previousEnd = formatDateTime(
+        previousEndsAt,
+        appointment.provider.timeZone,
+      );
+      const summary = appointmentSummary(appointment);
+      return {
+        to: appointment.clientEmail,
+        subject: "Seu agendamento foi reagendado",
+        html: renderEmail("Agendamento reagendado", [
+          `Olá, ${appointment.clientName}! Seu horário com ${appointment.provider.name} foi alterado.`,
+          `Horário anterior: ${previousStart} até ${previousEnd}.`,
+          `Novo horário: ${summary.start} até ${summary.end}.`,
+          `Serviço: ${appointment.service.name}.`,
+        ]),
+      };
+    }),
+    sendEmailSafely(() => {
+      const previousStart = formatDateTime(
+        previousStartsAt,
+        appointment.provider.timeZone,
+      );
+      const previousEnd = formatDateTime(
+        previousEndsAt,
+        appointment.provider.timeZone,
+      );
+      const summary = appointmentSummary(appointment);
+      return {
+        to: appointment.provider.email,
+        subject: `Agendamento reagendado: ${appointment.service.name}`,
+        html: renderEmail("Um agendamento foi reagendado", [
+          `Cliente: ${appointment.clientName} (${appointment.clientEmail}).`,
+          `Horário anterior: ${previousStart} até ${previousEnd}.`,
+          `Novo horário: ${summary.start} até ${summary.end}.`,
+          `Serviço: ${appointment.service.name}.`,
         ]),
       };
     }),

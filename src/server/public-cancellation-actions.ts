@@ -11,8 +11,15 @@ export async function cancelPublicAppointment(formData: FormData) {
     redirect("/agendamento/cancelar?result=invalid");
   }
 
-  const cancelled = await cancelAppointmentAndNotify({ cancelToken: token });
-  redirect(
-    `/agendamento/cancelar?result=${cancelled ? "cancelled" : "unavailable"}`,
+  const result = await cancelAppointmentAndNotify(
+    { cancelToken: token },
+    { respectMinimumNotice: true },
   );
+  const resultQuery =
+    result === "CANCELLED"
+      ? "cancelled"
+      : result === "TOO_LATE"
+        ? "too-late"
+        : "unavailable";
+  redirect(`/agendamento/${token}?result=${resultQuery}`);
 }

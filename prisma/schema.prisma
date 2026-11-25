@@ -20,18 +20,19 @@ enum AppointmentStatus {
 }
 
 model User {
-  id             String         @id @default(cuid())
-  name           String
-  email          String         @unique
-  slug           String?        @unique
-  passwordHash   String
-  role           UserRole
-  createdAt      DateTime       @default(now())
-  timeZone       String         @default("America/Sao_Paulo")
-  services       Service[]
-  availabilities Availability[]
-  timeOffs       TimeOff[]
-  appointments   Appointment[]
+  id                             String         @id @default(cuid())
+  name                           String
+  email                          String         @unique
+  slug                           String?        @unique
+  passwordHash                   String
+  role                           UserRole
+  createdAt                      DateTime       @default(now())
+  timeZone                       String         @default("America/Sao_Paulo")
+  minimumCancellationNoticeHours Int            @default(12)
+  services                       Service[]
+  availabilities                 Availability[]
+  timeOffs                       TimeOff[]
+  appointments                   Appointment[]
 }
 
 model Service {

@@ -9,6 +9,7 @@ export type GetAvailableSlotsOptions = {
   date: string;
   minimumNoticeHours?: number;
   slotIntervalMinutes?: number;
+  excludeAppointmentId?: string;
 };
 
 export type IsSlotAvailableOptions = Omit<GetAvailableSlotsOptions, "date"> & {
@@ -54,6 +55,7 @@ async function loadAvailableSlots(
     date,
     minimumNoticeHours,
     slotIntervalMinutes,
+    excludeAppointmentId,
   }: GetAvailableSlotsOptions,
   client: SchedulingClient = prisma,
 ) {
@@ -88,6 +90,7 @@ async function loadAvailableSlots(
       where: {
         providerId: provider.id,
         status: { not: AppointmentStatus.CANCELLED },
+        ...(excludeAppointmentId ? { id: { not: excludeAppointmentId } } : {}),
         startsAt: { lte: range.endsAt },
         endsAt: { gte: range.startsAt },
       },
@@ -128,6 +131,7 @@ export async function isSlotAvailable(
     startsAt,
     minimumNoticeHours,
     slotIntervalMinutes,
+    excludeAppointmentId,
   }: IsSlotAvailableOptions,
   client: SchedulingClient = prisma,
 ): Promise<boolean> {
@@ -154,6 +158,7 @@ export async function isSlotAvailable(
       date: localDate,
       minimumNoticeHours,
       slotIntervalMinutes,
+      excludeAppointmentId,
     },
     client,
   );

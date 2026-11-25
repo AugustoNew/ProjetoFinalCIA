@@ -106,15 +106,15 @@ export default async function BookingSuccessPage(props: {
               currency: "BRL",
             }).format(appointment.service.priceCents / 100)}
           </strong>
-          . Para cancelar, use o link abaixo. Para alterar o horário, entre em
-          contato com o prestador.
+          . Acesse os detalhes abaixo para cancelar ou reagendar dentro do prazo
+          permitido.
         </p>
 
         <Link
           className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
-          href={`/agendamento/cancelar?token=${encodeURIComponent(token)}`}
+          href={`/agendamento/${encodeURIComponent(token)}`}
         >
-          Cancelar agendamento
+          Gerenciar agendamento
         </Link>
 
         <Link

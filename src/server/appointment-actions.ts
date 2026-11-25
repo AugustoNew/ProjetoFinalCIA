@@ -46,10 +46,10 @@ export async function updateAppointmentStatus(
 
   const updated =
     parsedInput.data.status === "CANCELLED"
-      ? await cancelAppointmentAndNotify({
+      ? (await cancelAppointmentAndNotify({
           id: parsedInput.data.appointmentId,
           providerId: provider.id,
-        })
+        })) === "CANCELLED"
       : (
           await prisma.appointment.updateMany({
             where: {

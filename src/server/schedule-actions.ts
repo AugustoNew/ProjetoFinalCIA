@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import {
   timeOffIdSchema,
   timeOffSchema,
+  cancellationNoticeHoursSchema,
   timeZoneSchema,
   weeklyAvailabilitySchema,
 } from "@/lib/schedule-validation";
@@ -96,6 +97,37 @@ export async function updateProviderTimeZone(
 
   refreshSchedule();
   return { success: true, message: "Fuso horário atualizado." };
+}
+
+export async function updateCancellationNoticeHours(
+  input: unknown,
+): Promise<ScheduleActionResult> {
+  const provider = await getProvider();
+  if (!provider) {
+    return {
+      success: false,
+      message: "Faça login como prestador para continuar.",
+    };
+  }
+
+  const parsedHours = cancellationNoticeHoursSchema.safeParse(input);
+  if (!parsedHours.success) {
+    return {
+      success: false,
+      message: getValidationMessage(parsedHours.error),
+    };
+  }
+
+  await prisma.user.updateMany({
+    where: { id: provider.id, role: UserRole.PROVIDER },
+    data: { minimumCancellationNoticeHours: parsedHours.data },
+  });
+
+  refreshSchedule();
+  return {
+    success: true,
+    message: "Antecedência mínima atualizada.",
+  };
 }
 
 export async function createTimeOff(

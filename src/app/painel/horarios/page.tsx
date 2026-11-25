@@ -16,7 +16,11 @@ export default async function SchedulePage() {
 
   const provider = await prisma.user.findFirst({
     where: { id: userId, role: UserRole.PROVIDER },
-    select: { id: true, timeZone: true },
+    select: {
+      id: true,
+      timeZone: true,
+      minimumCancellationNoticeHours: true,
+    },
   });
 
   if (!provider) {
@@ -49,6 +53,7 @@ export default async function SchedulePage() {
         startsAt: timeOff.startsAt.toISOString(),
         endsAt: timeOff.endsAt.toISOString(),
       }))}
+      minimumCancellationNoticeHours={provider.minimumCancellationNoticeHours}
       timeZone={provider.timeZone}
     />
   );
