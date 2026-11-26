@@ -10,7 +10,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      `connect-src 'self'${isDevelopment ? " ws:" : ""}`,
+      `connect-src 'self'${isDevelopment ? " ws: wss:" : ""}`,
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -35,6 +35,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "*.app.github.dev"],
+    },
+  },
   turbopack: {
     rules: {
       "*.css": {
