@@ -12,6 +12,21 @@ Agendaki é uma aplicação web de agendamento online para prestadores de servi�
 - Emails de confirmação, avisos ao prestador e lembretes próximos de 24 horas antes da reserva.
 - Preços armazenados em centavos e horários recorrentes interpretados no fuso IANA do prestador.
 
+## Mapa de navegação
+
+- `/`: apresentação do Agendaki e acesso ao login ou cadastro.
+- `/login` e `/cadastro`: entrada e criação de conta do prestador.
+- `/painel`: resumo; o menu também leva a `/painel/servicos`,
+  `/painel/horarios`, `/painel/agenda` e `/painel/perfil`.
+- `/p/[slug]`: página pública de agendamento; `/p/[slug]/sucesso` confirma a
+  solicitação.
+- `/agendamento/[cancelToken]`: detalhes, cancelamento e reagendamento pelo
+  cliente; `/agendamento/cancelar` mantém compatibilidade com links antigos.
+
+O seed cria a página pública `/p/prestador-exemplo` e a conta demonstrativa
+`prestador@agendaki.dev` com senha `agendaki-demo`. Use somente em banco local
+descartável.
+
 ## Screenshots
 
 Capturas a adicionar antes da divulgação pública:

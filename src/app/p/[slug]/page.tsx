@@ -1,6 +1,7 @@
 import { UserRole } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { PublicBookingFlow } from "@/components/booking/public-booking-flow";
+import { SiteHeader } from "@/components/navigation/site-header";
 import { prisma } from "@/lib/prisma";
 import { formatDateTimeLocal } from "@/lib/time-zone";
 
@@ -36,17 +37,20 @@ export default async function PublicProviderPage(props: {
   }
 
   return (
-    <PublicBookingFlow
-      minimumDate={formatDateTimeLocal(new Date(), provider.timeZone).slice(
-        0,
-        10,
-      )}
-      provider={{
-        name: provider.name,
-        slug: provider.slug,
-        timeZone: provider.timeZone,
-      }}
-      services={provider.services}
-    />
+    <>
+      <SiteHeader professionalAreaLink />
+      <PublicBookingFlow
+        minimumDate={formatDateTimeLocal(new Date(), provider.timeZone).slice(
+          0,
+          10,
+        )}
+        provider={{
+          name: provider.name,
+          slug: provider.slug,
+          timeZone: provider.timeZone,
+        }}
+        services={provider.services}
+      />
+    </>
   );
 }

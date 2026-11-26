@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PublicSlugForm } from "@/components/profile/public-slug-form";
+import { PublicPageLink } from "@/components/navigation/public-page-link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
@@ -118,16 +118,7 @@ export default async function DashboardPage() {
           conta.
         </p>
         <PublicSlugForm slug={provider.slug ?? ""} />
-        {provider.slug && (
-          <Link
-            className="mt-4 inline-flex text-sm font-semibold text-teal-800 hover:underline"
-            href={`/p/${provider.slug}`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Abrir página pública
-          </Link>
-        )}
+        <PublicPageLink slug={provider.slug} />
       </div>
     </section>
   );

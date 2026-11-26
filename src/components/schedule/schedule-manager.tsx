@@ -272,6 +272,13 @@ export function ScheduleManager({
           </p>
         </div>
 
+        {availability.length === 0 && (
+          <p className="mb-4 rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-4 text-sm text-zinc-600">
+            Nenhum horário semanal foi definido. Ative os dias em que você
+            atende e salve a disponibilidade.
+          </p>
+        )}
+
         <div className="divide-y divide-zinc-100">
           {weekdays.map((day, dayOfWeek) => {
             const enabled = week[dayOfWeek].length > 0;
