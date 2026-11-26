@@ -1,6 +1,7 @@
-import { PrismaClient, UserRole, AppointmentStatus } from "@prisma/client";
+import pkg from "@prisma/client";
 import bcrypt from "bcryptjs";
 
+const { PrismaClient, UserRole, AppointmentStatus } = pkg;
 const prisma = new PrismaClient();
 const services = [
   {

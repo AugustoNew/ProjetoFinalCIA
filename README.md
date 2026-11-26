@@ -12,6 +12,71 @@ Agendaki é uma aplicação web de agendamento online para prestadores de servi�
 - Emails de confirmação, avisos ao prestador e lembretes próximos de 24 horas antes da reserva.
 - Preços armazenados em centavos e horários recorrentes interpretados no fuso IANA do prestador.
 
+## Como avaliar (GitHub Codespaces)
+
+Não é preciso instalar nada no computador. O ambiente roda no navegador.
+
+## 1. Abrir o projeto
+No repositório do GitHub, clique em **Code → Codespaces → Create codespace on main** e aguarde carregar.
+
+## 2. Instalar e configurar
+No terminal do Codespace, rode um comando por vez:
+
+```bash
+npm install
+cp .env.example .env
+```
+
+## 3. Gerar os segredos
+Rode o comando abaixo **duas vezes**:
+
+```bash
+openssl rand -base64 32
+```
+
+Abra o arquivo `.env` e cole os valores gerados:
+- 1º valor em `AUTH_SECRET="..."`
+- 2º valor em `CRON_SECRET="..."`
+
+Salve com **Ctrl + S**.
+
+## 4. Subir o banco de dados e criar as tabelas
+
+```bash
+docker compose up -d db
+npx prisma generate
+npm run db:migrate
+node --env-file=.env prisma/seed.mjs
+```
+
+## 5. Rodar o app
+
+```bash
+npm run dev
+```
+
+## 6. Abrir no navegador
+Abra a aba **Ports** (ao lado do Terminal), localize a porta **3000** e clique no ícone de globo.
+
+## 7. Ajustar a URL (necessário para login e cadastro)
+1. Copie a URL aberta no navegador (algo como `https://...-3000.app.github.dev`), sem barra no final.
+2. No `.env`, cole essa URL em `AUTH_URL` e `APP_URL`.
+3. Salve, pare o servidor com **Ctrl + C** e rode `npm run dev` novamente.
+
+## 8. Testar
+- **Login do prestador:** `/login`
+  - E-mail: `prestador@agendaki.dev`
+  - Senha: `agendaki-demo`
+- **Página pública de agendamento:** `/p/prestador-exemplo`
+- **Criar conta nova:** `/cadastro`
+
+Para acessar uma página, acrescente o caminho no final da URL do navegador (exemplo: `https://...-3000.app.github.dev/login`).
+
+## Problemas comuns
+- **Erro ao cadastrar ou entrar:** confira se `AUTH_URL` e `APP_URL` no `.env` têm a URL do Codespace e se o servidor foi reiniciado depois de salvar.
+- **Erro de conexão com o banco:** rode `docker compose up -d db` e tente de novo.
+- **Para parar tudo:** `Ctrl + C` no terminal e `docker compose down`.
+
 ## Mapa de navegação
 
 - `/`: apresentação do Agendaki e acesso ao login ou cadastro.
