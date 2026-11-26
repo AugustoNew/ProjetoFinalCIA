@@ -1,4 +1,6 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { SiteHeader } from "@/components/navigation/site-header";
 
 export const instant = false;
 
@@ -26,13 +28,22 @@ export default async function LegacyCancellationPage(props: {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 py-10">
-      <section className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
-        <h1 className="text-2xl font-bold text-zinc-900">
-          Cancelamento de agendamento
-        </h1>
-        <p className="mt-4 text-zinc-700">{message}</p>
-      </section>
-    </main>
+    <>
+      <SiteHeader />
+      <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-zinc-50 px-4 py-10">
+        <section className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+          <h1 className="text-2xl font-bold text-zinc-900">
+            Cancelamento de agendamento
+          </h1>
+          <p className="mt-4 text-zinc-700">{message}</p>
+          <Link
+            className="mt-5 inline-flex font-semibold text-teal-800"
+            href="/"
+          >
+            Voltar ao início
+          </Link>
+        </section>
+      </main>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 type GlobalErrorProps = {
   error: Error & { digest?: string };
@@ -53,6 +54,17 @@ export default function GlobalError({ error, retry }: GlobalErrorProps) {
             >
               Tentar novamente
             </button>
+            <Link
+              href="/"
+              style={{
+                color: "#115e59",
+                display: "block",
+                fontWeight: 600,
+                marginTop: "1rem",
+              }}
+            >
+              Voltar ao início
+            </Link>
           </section>
         </main>
       </body>
